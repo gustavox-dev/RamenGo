@@ -2,8 +2,9 @@ package com.example.RamenGo.service;
 
 import com.example.RamenGo.adapters.ExternalClientAdapter;
 import com.example.RamenGo.adapters.OrderDTOAdapter;
-import com.example.RamenGo.domain.Broths;
+import com.example.RamenGo.domain.Broth;
 import com.example.RamenGo.domain.Order;
+import com.example.RamenGo.domain.OrderIdResponse;
 import com.example.RamenGo.domain.Proteins;
 import com.example.RamenGo.dto.OrderDTO;
 import com.example.RamenGo.exceptions.IdsMissingException;
@@ -12,7 +13,6 @@ import com.example.RamenGo.exceptions.ItemNotFoundException;
 import com.example.RamenGo.exceptions.UnauthorisedException;
 import com.example.RamenGo.repository.OrderRepository;
 import com.example.RamenGo.response.OrderResponse;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,7 +44,7 @@ public class OrderService {
     @Autowired
     private ExternalClientAdapter externalClientAdapter;
 
-    public OrderResponse createOrder(String apiKey, String order) throws ItemNotFoundException, UnauthorisedException, IOException, InterruptedException, InternalErrorException {
+    public OrderResponse createOrder(String apiKey, String order) throws InternalErrorException {
 
         try {
             OrderDTO orderDTO = orderDTOAdapter.convertOrderDTOToText(order);
@@ -55,28 +55,34 @@ public class OrderService {
             tokenService.validateToken(apiKey);
 
             Proteins proteins = proteinsService.findProteinById(orderDTO.brothId());
-            Broths broths = brothsService.findBrothsById(orderDTO.proteinId());
+            Broth broth = brothsService.findBrothsById(orderDTO.proteinId());
 
-            String description = broths.getName() + " and " + proteins.getName() + " Ramen";
+            String description = broth.getName() + " and " + proteins.getName() + " Ramen";
             String image = "https://tech.redventures.com.br/icons/ramen/ramenChasu.png";
+            String orderId = externalClientAdapter.fetchDataFromExternalApi(apiKey);
 
             Order newOrder = Order.builder()
+                    .id(orderId)
                     .proteinId(proteins.getId())
-                    .brothId(broths.getId())
+                    .brothId(broth.getId())
                     .build();
 
-            String orderId = externalClientAdapter.fetchDataFromExternalApi(apiKey);
+
 
             saveOrder(newOrder);
             return new OrderResponse(orderId, description, image);
+        } catch (IdsMissingException e){
+            LOG.error("======== ERROR ======== {}", e.getMessage());
+            throw new IdsMissingException();
         } catch (Exception e){
             LOG.error(e.getMessage());
             throw new InternalErrorException();
         }
     }
 
-    public List<Order> findAll() throws InternalErrorException {
+    public List<Order> findAll(String apiKey) throws InternalErrorException {
         try{
+            tokenService.validateToken(apiKey);
             return repo.findAll();
         } catch (Exception e){
             LOG.error(e.getMessage());

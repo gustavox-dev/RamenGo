@@ -21,18 +21,18 @@ import java.io.IOException;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/order")
 public class OrderController {
 
     @Autowired
     private OrderService service;
 
-    @GetMapping("/order")
+    @GetMapping
     public List<Order> findAll(@RequestHeader("x-api-key") String apiKey) throws InternalErrorException {
-        return service.findAll();
+        return service.findAll(apiKey);
     }
 
-    @PostMapping(value = "/order")
+    @PostMapping
     @Operation(summary = "Place an order")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Order placed successfully",

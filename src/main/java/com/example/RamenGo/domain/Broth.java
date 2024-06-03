@@ -4,14 +4,14 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.List;
-
 @EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "TB_broths")
-@Data
+@Getter
+@Setter
+@AllArgsConstructor
 @NoArgsConstructor
-public class Broths extends Preparation{
+public class Broth extends Preparation{
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -19,9 +19,9 @@ public class Broths extends Preparation{
     private Long id;
 
     @Builder
-    public Broths(String imageInactive, String imageActive, String name, String description, Integer price) {
+    public Broth(Long id, String imageInactive, String imageActive, String name, String description, Integer price) {
         super(imageInactive, imageActive, name, description, price);
+        this.id = id;
     }
-
 
 }

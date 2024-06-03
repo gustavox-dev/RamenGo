@@ -2,6 +2,7 @@ package com.example.RamenGo.adapters;
 
 import com.example.RamenGo.domain.OrderIdResponse;
 import com.example.RamenGo.dto.OrderDTO;
+import com.example.RamenGo.exceptions.UnauthorisedException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.LogManager;
@@ -9,6 +10,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.net.ConnectException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -22,19 +24,24 @@ public class ExternalClientAdapter implements IExternalClientAdapter{
     private static final Logger LOG = LogManager.getLogger();
 
     @Override
-    public String fetchDataFromExternalApi(String apiKey) throws IOException, InterruptedException {
+    public String fetchDataFromExternalApi(String apiKey) throws IOException, InterruptedException, UnauthorisedException {
 
-        HttpRequest request = HttpRequest.newBuilder()
-                .POST(HttpRequest.BodyPublishers.noBody())
-                .uri(URI.create(URL))
-                .header("x-api-key", apiKey)
-                .build();
+        try{
+            HttpRequest request = HttpRequest.newBuilder()
+                    .POST(HttpRequest.BodyPublishers.noBody())
+                    .uri(URI.create(URL))
+                    .header("x-api-key", apiKey)
+                    .build();
 
-        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-        OrderIdResponse orderIdResponse = convertOrderDTOToText(response.body());
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            OrderIdResponse orderIdResponse = convertOrderDTOToText(response.body());
 
-        LOG.info("Success requested with response: " + response.body());
-        return orderIdResponse.getOrderId();
+            LOG.info("Solicitação bem-sucedida: " + response.body());
+            return orderIdResponse.getOrderId();
+        }catch (ConnectException e) {
+            LOG.error(" =========== Error =========== {}", e.getMessage());
+            throw new ConnectException();
+        }
     }
 
     @Override

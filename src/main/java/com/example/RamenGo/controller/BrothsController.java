@@ -1,13 +1,10 @@
 package com.example.RamenGo.controller;
 
-import com.example.RamenGo.domain.Broths;
+import com.example.RamenGo.domain.Broth;
 import com.example.RamenGo.error.Error403Response;
-import com.example.RamenGo.exceptions.InternalErrorException;
-import com.example.RamenGo.exceptions.MissingAttributeException;
 import com.example.RamenGo.exceptions.UnauthorisedException;
 import com.example.RamenGo.service.BrothsService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -32,13 +29,9 @@ public class BrothsController {
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = Error403Response.class))),
     })
-    public List<Broths> findAll(@RequestHeader("x-api-key") String apiKey) throws UnauthorisedException {
+    public List<Broth> findAll(@RequestHeader("x-api-key") String apiKey) throws UnauthorisedException {
         return service.findAll(apiKey);
     }
 
-    @PostMapping("/broths")
-    public Broths createBroths(@RequestBody Broths broths, @RequestHeader("x-api-key") String apiKey) throws MissingAttributeException, InternalErrorException {
-        return service.createBroths(broths);
-    }
 
 }

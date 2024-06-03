@@ -33,11 +33,7 @@ public class ProteinsController {
                             schema = @Schema(implementation = Error403Response.class))),
     })
     public List<Proteins> findAll(@RequestHeader("x-api-key") String apiKey) throws UnauthorisedException {
-        return service.findAll();
+        return service.findAll(apiKey);
     }
 
-    @PostMapping("/proteins")
-    public ProteinsResponse createProteins(@RequestHeader("x-api-key") String apiKey, @RequestBody ProteinsDTO proteins) throws InternalErrorException {
-        return service.createProteins(proteins);
-    }
 }

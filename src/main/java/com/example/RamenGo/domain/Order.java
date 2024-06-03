@@ -15,8 +15,7 @@ import lombok.NoArgsConstructor;
 public class Order {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+    private String id;
 
     private Long brothId;
 
