@@ -21,7 +21,7 @@ import java.io.IOException;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/order")
+@RequestMapping("/api")
 public class OrderController {
 
     @Autowired
@@ -32,7 +32,7 @@ public class OrderController {
         return service.findAll(apiKey);
     }
 
-    @PostMapping
+    @PostMapping("/order")
     @Operation(summary = "Place an order")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Order placed successfully",
@@ -49,6 +49,26 @@ public class OrderController {
                             schema = @Schema(implementation = Error500Response.class)))
     })
     public OrderResponse createBroths(@RequestHeader("x-api-key") String apiKey, @RequestBody String order) throws IOException, ItemNotFoundException, UnauthorisedException, InterruptedException, InternalErrorException {
+        return service.createOrder(apiKey, order);
+    }
+
+    @PostMapping("/orders")
+    @Operation(summary = "Place an order")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Order placed successfully",
+                    content = @Content(mediaType = "text/plain",
+                            schema = @Schema(implementation = OrderResponse.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid request",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = Error400Response.class))),
+            @ApiResponse(responseCode = "403", description = "Forbidden",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = Error403Response.class))),
+            @ApiResponse(responseCode = "500", description = "Internal server error",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = Error500Response.class)))
+    })
+    public OrderResponse createBrothsOtherUrl(@RequestHeader("x-api-key") String apiKey, @RequestBody String order) throws IOException, ItemNotFoundException, UnauthorisedException, InterruptedException, InternalErrorException {
         return service.createOrder(apiKey, order);
     }
 
