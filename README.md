@@ -12,6 +12,7 @@
   Spring Boot<br>
   Swagger<br>
   JUnit<br>
+  Mockito<br>
   RESTful<br>
   x-api-key<br>
 
